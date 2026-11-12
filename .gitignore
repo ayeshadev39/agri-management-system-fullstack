@@ -1,0 +1,7 @@
+node_modules/
+.env
+public/Images/*
+!public/Images/.gitkeep
+dist/
+build/
+.DS_Store

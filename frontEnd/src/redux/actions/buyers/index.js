@@ -8,9 +8,10 @@ export const GETBUYERS = () => (dispatch) => {
   }).catch(err => dispatch(FAILURE(BUYER_REQUEST.GET_BUYERS_FAILURE, err.message)));
 };
 
-export const ADDBUYER = (data, next) => (dispatch) => {
+export const ADDBUYER = (payload, next) => (dispatch) => {
   dispatch(REQUEST(BUYER_REQUEST.ADD_BUYER_REQUEST));
-  createBuyer(data).then((res) => { 
+  // ✅ payload me buyerData aur imageFile dono honge
+  createBuyer(payload.buyerData, payload.imageFile).then((res) => { 
     if(res.data.succeeded) { 
       dispatch(SUCCESS(BUYER_REQUEST.ADD_BUYER_SUCCESS, res.data.data)); 
       if(next) next(); 

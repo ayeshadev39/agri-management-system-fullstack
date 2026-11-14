@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ADDWORKER, REMOVEWORKER, UPDATEWORKER } from "../../../redux/actions/workers";
-import { ADDATTENDANCE } from "../../../redux/actions/attendance"; // ✅ Attendance Action
+import { ADDWORKER, REMOVEWORKER, UPDATEWORKER, GETWORKERS } from "../../../redux/actions/workers";
+import { MARKATTENDANCE, GETATTENDANCE } from "../../../redux/actions/attendance";
 import ConfirmModal from "../../../components/common/ConfirmModal";
 
 export default function Workers() {
@@ -13,9 +13,12 @@ export default function Workers() {
   const [form, setForm] = useState({ fullName: "", cnic: "", phone: "", role: "Farm Hand", dailyWage: "", joinDate: "", status: "Active" });
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
-  
-  // Attendance State
   const [attDate, setAttDate] = useState(new Date().toISOString().split("T")[0]);
+
+  useEffect(() => {
+    dispatch(GETWORKERS());
+    dispatch(GETATTENDANCE());
+  }, [dispatch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -23,26 +26,23 @@ export default function Workers() {
     const payload = { ...form, dailyWage: Number(form.dailyWage) };
 
     if (editing) {
-      dispatch(UPDATEWORKER({ ...payload, id: editing.id }, () => { setEditing(null); setForm({ fullName: "", cnic: "", phone: "", role: "Farm Hand", dailyWage: "", joinDate: "", status: "Active" }); }));
+      dispatch(UPDATEWORKER({ ...payload, id: editing.id }, () => { setEditing(null); setForm({ fullName: "", cnic: "", phone: "", role: "Farm Hand", dailyWage: "", joinDate: "", status: "Active" }); dispatch(GETWORKERS()); }));
     } else {
       dispatch(ADDWORKER(payload, () => setForm({ fullName: "", cnic: "", phone: "", role: "Farm Hand", dailyWage: "", joinDate: "", status: "Active" })));
     }
   };
 
   const handleMarkAttendance = (workerId, status) => {
-    // Check agar aaj ki attendance pehle se hai
-    const existing = attendance.find(a => a.workerId === workerId && a.date === attDate);
-    if (existing) return alert("Attendance already marked for this date!");
-
-    dispatch(ADDATTENDANCE({ workerId, date: attDate, status, note: "" }, () => {}));
+    dispatch(MARKATTENDANCE({ workerId, date: attDate, status }, () => {
+      dispatch(GETATTENDANCE());
+    }));
   };
 
   return (
     <div className="animate-fade-up pb-5">
       <div className="mb-4"><h3 className="fw-bold mb-1">Workers & Labour</h3><p className="text-muted mb-0">Manage workers and daily attendance</p></div>
 
-      <div className="row g-4 mb-4">
-        {/* Add Worker Form */}
+      <div className="row g-4">
         <div className="col-lg-4">
           <div className="glass-card p-4">
             <h5 className="fw-bold mb-3">{editing ? "Edit Worker" : "Add Worker"}</h5>
@@ -60,7 +60,6 @@ export default function Workers() {
           </div>
         </div>
 
-        {/* Worker List & Attendance */}
         <div className="col-lg-8">
           <div className="glass-card p-4 h-100">
             <div className="d-flex justify-content-between align-items-center mb-4">

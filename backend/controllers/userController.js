@@ -3,10 +3,15 @@ const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 const { ok, fail } = require("../utils/response");
 
-// 1. Signup API (Ab ye hamesha Admin banayega)
+// 1. Signup/Register API (Ab ye sirf Admin ke liye hai)
 const register = async (req, res) => {
   try {
-    const { fullName, username, email, password } = req.body;
+    // ✅ Check: Agar request bhejne wala Admin nahi hai to reject karein
+    if (req.user.role !== "admin") {
+      return fail(res, "Only Admin can register new users", 403);
+    }
+
+    const { fullName, username, email, password, role } = req.body;
     if (!fullName || !username || !email || !password) return fail(res, "All fields are required", 400);
 
     const existingUser = await User.findOne({ where: { email } });
@@ -20,15 +25,14 @@ const register = async (req, res) => {
       username, 
       email, 
       password: hashedPassword,
-      role: "admin" // ✅ Ab har naya account Admin banega
+      role: role || "manager" // Default role manager hoga
     });
     
     return ok(res, { 
       id: user.id, 
       username: user.username, 
-      role: user.role, 
-      token: generateToken(user.id) 
-    }, "Account created", 201);
+      role: user.role
+    }, "Account created successfully", 201);
     
   } catch (err) {
     return fail(res, err.message, 500);

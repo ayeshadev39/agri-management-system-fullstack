@@ -4,7 +4,6 @@ export const login = async (credentials) => {
   try {
     const res = await axiosInstance.post("/users/login", credentials);
     if (res.data.succeeded) {
-      // ✅ Backend ka data LocalStorage me save karein
       const userData = {
         username: res.data.data.username,
         role: res.data.data.role,
@@ -32,3 +31,7 @@ export const getSession = () => {
     return { data: { succeeded: false } };
   }
 };
+
+// ✅ Naye functions (Admin ke liye)
+export const getAllUsers = async () => await axiosInstance.get("/users");
+export const deleteUser = async (id) => await axiosInstance.delete(`/users/${id}`);

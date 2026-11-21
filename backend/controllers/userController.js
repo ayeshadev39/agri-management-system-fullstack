@@ -3,14 +3,9 @@ const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 const { ok, fail } = require("../utils/response");
 
-// 1. Signup/Register API (Ab ye sirf Admin ke liye hai)
+// 1. Signup / Create User
 const register = async (req, res) => {
   try {
-    // ✅ Check: Agar request bhejne wala Admin nahi hai to reject karein
-    if (req.user.role !== "admin") {
-      return fail(res, "Only Admin can register new users", 403);
-    }
-
     const { fullName, username, email, password, role } = req.body;
     if (!fullName || !username || !email || !password) return fail(res, "All fields are required", 400);
 
@@ -25,21 +20,16 @@ const register = async (req, res) => {
       username, 
       email, 
       password: hashedPassword,
-      role: role || "manager" // Default role manager hoga
+      role: role || "manager" 
     });
     
-    return ok(res, { 
-      id: user.id, 
-      username: user.username, 
-      role: user.role
-    }, "Account created successfully", 201);
-    
+    return ok(res, { id: user.id, username: user.username, role: user.role }, "Account created", 201);
   } catch (err) {
     return fail(res, err.message, 500);
   }
 };
 
-// 2. Login API
+// 2. Login
 const login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -59,4 +49,32 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+// 3. Get All Users (Admin Only)
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.findAll({ attributes: { exclude: ['password'] } });
+    return ok(res, users);
+  } catch (err) {
+    return fail(res, err.message, 500);
+  }
+};
+
+// 4. Delete User (Admin Only)
+const removeUser = async (req, res) => {
+  try {
+    // ✅ Check: Admin khud ko delete na kar sake
+    if (req.user.id === req.params.id) {
+      return fail(res, "You cannot delete your own account", 400);
+    }
+
+    const user = await User.findByPk(req.params.id);
+    if (!user) return fail(res, "User not found", 404);
+
+    await user.destroy();
+    return ok(res, { id: req.params.id }, "User deleted successfully");
+  } catch (err) {
+    return fail(res, err.message, 500);
+  }
+};
+
+module.exports = { register, login, getAllUsers, removeUser };

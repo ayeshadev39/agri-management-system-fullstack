@@ -4,20 +4,24 @@ import axiosInstance from "../../redux/api/axiosSetup";
 
 export default function Signup() {
   const [form, setForm] = useState({ fullName: "", username: "", email: "", password: "", role: "manager" });
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
+      // ✅ Backend ko request bhej rahe hain
       const res = await axiosInstance.post("/users/register", form);
+      
       if (res.data.succeeded) {
-        alert("Account created successfully! Please login.");
-        navigate("/login");
+        alert("User created successfully!");
+        navigate("/users"); // Add hone ke baad Users list par bhej dein
       }
     } catch (err) {
-      alert(err.response?.data?.message || "Signup failed!");
+      // ✅ Asal error message show karein
+      console.error("Signup Error:", err.response?.data);
+      alert(err.response?.data?.message || "Failed to create user. Check console.");
     } finally {
       setLoading(false);
     }
@@ -33,11 +37,23 @@ export default function Signup() {
         </div>
 
         <form onSubmit={handleSignup}>
-          <div className="mb-3"><label className="form-label small fw-bold">Full Name</label><input type="text" className="form-control" value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} required /></div>
-          <div className="mb-3"><label className="form-label small fw-bold">Username</label><input type="text" className="form-control" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} required /></div>
-          <div className="mb-3"><label className="form-label small fw-bold">Email</label><input type="email" className="form-control" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /></div>
+          <div className="mb-3">
+            <label className="form-label small fw-bold">Full Name</label>
+            <input type="text" className="form-control" placeholder="Enter full name" value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label small fw-bold">Username</label>
+            <input type="text" className="form-control" placeholder="Choose username" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label small fw-bold">Email</label>
+            <input type="email" className="form-control" placeholder="Enter email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+          </div>
           <div className="row g-2 mb-4">
-            <div className="col-md-6"><label className="form-label small fw-bold">Password</label><input type="password" className="form-control" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required /></div>
+            <div className="col-md-6">
+              <label className="form-label small fw-bold">Password</label>
+              <input type="password" className="form-control" placeholder="••••••••" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
+            </div>
             <div className="col-md-6">
               <label className="form-label small fw-bold">Role</label>
               <select className="form-select" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
@@ -46,11 +62,13 @@ export default function Signup() {
               </select>
             </div>
           </div>
-          <button type="submit" className="btn btn-premium w-100" disabled={loading}>{loading ? "Creating..." : "Register User"}</button>
+          <button type="submit" className="btn btn-premium w-100" disabled={loading}>
+            {loading ? "Creating..." : "Register User"}
+          </button>
         </form>
 
         <div className="mt-4 text-center">
-          <Link to="/login" className="text-success fw-bold text-decoration-none small">Back to Login</Link>
+          <Link to="/users" className="text-success fw-bold text-decoration-none small">Back to Users List</Link>
         </div>
       </div>
     </div>

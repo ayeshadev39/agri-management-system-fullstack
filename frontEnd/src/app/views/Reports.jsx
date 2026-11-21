@@ -6,14 +6,14 @@ export default function Reports() {
   const crops = useSelector((state) => state.crops.crops) || [];
   const orders = useSelector((state) => state.orders.orders) || [];
   const expenses = useSelector((state) => state.expenses.expenses) || [];
-  
-  // ✅ Activity logs yahan se aa rahe hain
   const activity = useSelector((state) => state.activity.logs) || [];
 
-  const totalHarvested = crops.reduce((s, c) => s + (c.harvestedQty || 0), 0);
-  const totalSold = crops.reduce((s, c) => s + (c.soldQty || 0), 0);
-  const totalExpense = expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
-  const totalRevenue = totalSold * 100;
+  // ✅ FIX: Number() laga diya taake String se Math ho sake
+  const totalHarvested = crops.reduce((s, c) => s + (Number(c.harvestedQty) || 0), 0);
+  const totalSold = crops.reduce((s, c) => s + (Number(c.soldQty) || 0), 0);
+  const totalExpense = expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  
+  const totalRevenue = totalSold * 100; // Farz karein 1 unit = 100 Rs
   const netProfit = totalRevenue - totalExpense;
 
   const handleExportReport = () => {

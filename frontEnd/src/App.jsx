@@ -17,6 +17,7 @@ import Reports from "./app/views/Reports";
 import NotFound from "./app/views/NotFound";
 import Workers from "./app/views/Workers";
 import Equipment from "./app/views/Equipment";
+import Users from "./app/views/Users"; // ✅ Users Import
 
 // Actions import karein
 import { GETSESSION } from "./redux/actions/user";
@@ -26,8 +27,9 @@ import { GETBUYERS } from "./redux/actions/buyers";
 import { GETTASKS } from "./redux/actions/tasks";
 import { GETEXPENSES } from "./redux/actions/expenses";
 import { GETINVENTORY } from "./redux/actions/inventory";
-import { GETWORKERS } from "./redux/actions/workers";       // ✅ Workers
-import { GETEQUIPMENT } from "./redux/actions/equipment";   // ✅ Equipment
+import { GETWORKERS } from "./redux/actions/workers";
+import { GETEQUIPMENT } from "./redux/actions/equipment";
+import { GETATTENDANCE } from "./redux/actions/attendance";
 
 function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -36,7 +38,6 @@ function Layout() {
   const { isAuthenticated, role } = useSelector((state) => state.user);
   
   useEffect(() => {
-    // ✅ Session check karein, agar login hai to sab data fetch karein
     dispatch(GETSESSION(() => {
       dispatch(GETCROPS());
       dispatch(GETORDERS());
@@ -44,8 +45,9 @@ function Layout() {
       dispatch(GETTASKS());
       dispatch(GETEXPENSES());
       dispatch(GETINVENTORY());
-      dispatch(GETWORKERS());       // ✅ Workers Data
-      dispatch(GETEQUIPMENT());     // ✅ Equipment Data
+      dispatch(GETWORKERS());
+      dispatch(GETEQUIPMENT());
+      dispatch(GETATTENDANCE());
     }));
   }, [dispatch]);
 
@@ -77,6 +79,7 @@ function Layout() {
             <Route path="/workers" element={<Workers />} />
             <Route path="/equipment" element={<Equipment />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/users" element={<Users />} /> {/* ✅ Users Route */}
             <Route path="/signup" element={<Signup />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

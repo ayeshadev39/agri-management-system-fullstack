@@ -27,11 +27,12 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, [dispatch]);
 
-  const totalHarvested = crops.reduce((sum, c) => sum + (c.harvestedQty || 0), 0);
-  const totalSold = crops.reduce((sum, c) => sum + (c.soldQty || 0), 0);
+  // ✅ FIX: Number() laga diya taake text ko math me convert kar sakein
+  const totalHarvested = crops.reduce((sum, c) => sum + (Number(c.harvestedQty) || 0), 0);
+  const totalSold = crops.reduce((sum, c) => sum + (Number(c.soldQty) || 0), 0);
   const totalRemaining = totalHarvested - totalSold;
   const humidity = weather?.current?.relative_humidity_2m;
-  const totalExpense = expenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
+  const totalExpense = expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
   const pendingTasks = tasks.filter(t => t.status !== 'done').length;
 
   return (
@@ -63,35 +64,21 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* ✅ Weather & Humidity (Naya Premium Design) */}
+        {/* Weather & Humidity */}
         <div className="row g-4 mb-4">
           <div className="col-lg-6">
-            <div className="weather-widget h-100 d-flex flex-column justify-content-between">
+            <div className="weather-widget h-100">
               <div className="d-flex justify-content-between align-items-start position-relative" style={{ zIndex: 1 }}>
                 <div>
-                  <h5 className="mb-1 text-white opacity-75 d-flex align-items-center gap-2">
-                    <span className="material-icons fs-6">location_on</span> Lahore, Pakistan
-                  </h5>
-                  <div className="weather-temp mt-2">{Math.round(weather?.current?.temperature_2m || 0)}°C</div>
-                  <p className="mb-0 mt-2 text-white opacity-90 fw-semibold">
-                    Clear Sky • Feels like {Math.round(weather?.current?.temperature_2m || 0)}°C
-                  </p>
+                  <h5 className="mb-1 text-white opacity-75">Lahore, Pakistan</h5>
+                  <div className="weather-temp">{Math.round(weather?.current?.temperature_2m || 0)}°C</div>
+                  <p className="mb-0 mt-2 text-white opacity-75">Clear Sky • Feels like {Math.round(weather?.current?.temperature_2m || 0)}°C</p>
                 </div>
-                <span className="material-icons position-relative" style={{ fontSize: "6rem", color: "#fbbf24", textShadow: "0 4px 15px rgba(251, 191, 36, 0.5)", zIndex: 2 }}>
-                  wb_sunny
-                </span>
+                <span className="material-icons" style={{ fontSize: "5rem", opacity: 0.8 }}>wb_sunny</span>
               </div>
-              
-              <div className="d-flex flex-wrap gap-3 mt-4 position-relative" style={{ zIndex: 1 }}>
-                <div className="weather-detail">
-                  <span className="material-icons text-info">water_drop</span> {humidity || 0}% Humidity
-                </div>
-                <div className="weather-detail">
-                  <span className="material-icons text-light">air</span> {weather?.current?.wind_speed_10m || 0} km/h
-                </div>
-                <div className="weather-detail">
-                  <span className="material-icons text-warning">umbrella</span> {weather?.daily?.precipitation_probability_max?.[0] || 0}% Rain
-                </div>
+              <div className="d-flex gap-3 mt-4 position-relative" style={{ zIndex: 1 }}>
+                <div className="weather-detail"><span className="material-icons">water_drop</span> {humidity || 0}% Humidity</div>
+                <div className="weather-detail"><span className="material-icons">air</span> {weather?.current?.wind_speed_10m || 0} km/h</div>
               </div>
             </div>
           </div>

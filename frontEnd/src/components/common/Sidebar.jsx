@@ -11,11 +11,11 @@ export default function Sidebar({ isOpen, onClose, role }) {
     { path: "/inventory", label: "Inventory", icon: "inventory_2" },
     { path: "/workers", label: "Workers", icon: "engineering" },
     { path: "/equipment", label: "Equipment", icon: "agriculture" },
-    { path: "/signup", label: "Sign Up", icon: "person_add" }, // ✅ Signup Link Add Kiya
   ];
 
-  // Sirf Admin ko Reports dekhne ki ijazat hai
-  if (role === "Admin") {
+  // ✅ Sirf Admin ko Users aur Reports dekhne ki ijazat hai
+  if (role === "Admin" || role === "admin") {
+    links.push({ path: "/users", label: "Users Management", icon: "manage_accounts" });
     links.push({ path: "/reports", label: "Reports & Logs", icon: "analytics" });
   }
 

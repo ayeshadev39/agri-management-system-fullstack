@@ -9,10 +9,8 @@ import ConfirmModal from "../../components/common/ConfirmModal";
 
 export default function HarvestOrders() {
   const dispatch = useDispatch();
-  
-  // ✅ Naya Redux State
-  const crops = useSelector((state) => state.crops.crops);
-  const orders = useSelector((state) => state.orders.orders);
+  const crops = useSelector((state) => state.crops.crops) || [];
+  const orders = useSelector((state) => state.orders.orders) || [];
   const role = useSelector((state) => state.user.role);
 
   const [showForm, setShowForm] = useState(false);
@@ -20,8 +18,9 @@ export default function HarvestOrders() {
   const [deleteId, setDeleteId] = useState(null);
   const [form, setForm] = useState({ buyerName: "", cropId: "", quantity: "", orderDate: "", status: "pending" });
 
-  const totalHarvested = crops.reduce((s, c) => s + (c.harvestedQty || 0), 0);
-  const totalSold = crops.reduce((s, c) => s + (c.soldQty || 0), 0);
+  // ✅ FIX: Number() laga diya taake String se Math ho sake
+  const totalHarvested = crops.reduce((s, c) => s + (Number(c.harvestedQty) || 0), 0);
+  const totalSold = crops.reduce((s, c) => s + (Number(c.soldQty) || 0), 0);
   const remaining = totalHarvested - totalSold;
   
   const handleOpenForm = (order = null) => {
@@ -84,14 +83,14 @@ export default function HarvestOrders() {
                   <td className="py-3">
                     <select 
                       className="form-select form-select-sm border-0 fw-bold" style={{ width: "130px", background: "var(--bg-color)", color: "var(--text-main)" }}
-                      value={o.status} disabled={role !== "Admin"}
+                      value={o.status} disabled={role !== "Admin" && role !== "admin"}
                       onChange={(e) => dispatch(UPDATEORDER({ id: o.id, status: e.target.value }))}
                     >
                       <option value="pending">Pending</option><option value="inTransit">In Transit</option><option value="delivered">Delivered</option>
                     </select>
                   </td>
                   <td className="text-end py-3">
-                    {role === "Admin" ? (
+                    {(role === "Admin" || role === "admin") ? (
                       <>
                         <button className="btn btn-sm btn-light text-primary me-1" onClick={() => handleOpenForm(o)}><span className="material-icons" style={{ fontSize: 18 }}>edit</span></button>
                         <button className="btn btn-sm btn-light text-danger" onClick={() => setDeleteId(o.id)}><span className="material-icons" style={{ fontSize: 18 }}>delete</span></button>

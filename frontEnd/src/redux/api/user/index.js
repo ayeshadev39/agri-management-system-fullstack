@@ -32,6 +32,9 @@ export const getSession = () => {
   }
 };
 
-// ✅ Naye functions (Admin ke liye)
 export const getAllUsers = async () => await axiosInstance.get("/users");
+
 export const deleteUser = async (id) => await axiosInstance.delete(`/users/${id}`);
+
+// ✅ Naya function User ka Role update karne ke liye
+export const updateUser = async (userData) => await axiosInstance.put(`/users/${userData.id}`, userData);
